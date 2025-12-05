@@ -201,25 +201,12 @@ function update(dt: number) {
     // gameStarted = true;
     // testbed.start(world);
 
-    // if (SYSTEM.TWO_PLAYER) {
-    //   status.textContent = "";
-    //   title.textContent = "";
-    //   document.body.classList.remove("not-started");
-    //   setTopText("");
-    //   gameStarted = true;
-
-    //   testbed.start(world);
-    //   world.step(dt);
-
-    //   setTimeout(() => {
-    //     launchPlayer1();
-    //     launchPlayer2();
-    //   }, 500);
-
     if (SYSTEM.TWO_PLAYER) {
-      status.textContent = "Game Started!";
+      status.textContent = "";
+      title.textContent = "";
+      document.body.classList.remove("not-started");
+      setTopText("");
       gameStarted = true;
-
       testbed.start(world);
 
       setCenterText("5");
@@ -237,12 +224,7 @@ function update(dt: number) {
     }
   } else {
     const dt_seconds = dt / 1000;
-    // const SPEED = 50;
-    const SPEED = 10000;
-
-    if (PLAYER_1.A && !hasPlayer1Launched) {
-      launchPlayer1();
-    }
+    const SPEED = 50;
 
     const testStepDelta = 20;
     const testStepResolution = 64;
