@@ -1,7 +1,16 @@
+@font-face {
+    font-family: "Sixtyfour";
+    src:
+        local("Sixtyfour"),
+        url("font.ttf") format("truetype");
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Sixtyfour";
+    text-align: center;
 }
 
 html,
@@ -20,7 +29,7 @@ body {
     position: absolute;
     inset-block: 0px;
     left: 0px;
-    width: 37px;
+    width: 48px;
     z-index: 9999;
     padding: 4px;
     display: flex;
@@ -31,11 +40,11 @@ body {
 }
 
 #player-1-data > * {
-    font-size: 0.4rem;
+    font-size: 0.3rem;
     text-align: left;
 }
 #player-2-data > * {
-    font-size: 0.4rem;
+    font-size: 0.3rem;
     text-align: right;
 }
 
@@ -44,7 +53,7 @@ body {
     position: absolute;
     inset-block: 0px;
     right: 0px;
-    width: 37px;
+    width: 48px;
     z-index: 9999;
     padding: 4px;
     display: flex;
@@ -69,6 +78,13 @@ body {
     width: 100%;
     background: greenyellow;
     border-radius: 4px;
+}
+
+.not-started #player-1-data {
+    visibility: hidden;
+}
+.not-started #player-2-data {
+    visibility: hidden;
 }
 
 body > canvas {
@@ -103,4 +119,25 @@ button {
 
 button:hover {
     background-color: #5a5a7a;
+}
+
+#top-text-container {
+    position: absolute;
+    inset-inline: 0px;
+    top: 12px;
+    display: grid;
+    place-items: center;
+}
+.not-started #top-text-container {
+    visibility: hidden;
+}
+
+#center-text-container {
+    position: absolute;
+    inset: 0px;
+    display: grid;
+    place-items: center;
+}
+.not-started #center-text-container {
+    visibility: hidden;
 }
