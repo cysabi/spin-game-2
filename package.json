@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@rcade/plugin-input-classic": "^0.2.1",
+        "@rcade/plugin-input-spinners": "^0.1.8",
         "planck": "^1.4.2"
     }
 }

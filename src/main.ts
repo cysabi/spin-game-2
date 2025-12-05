@@ -1,7 +1,10 @@
-import { Box, Edge, World, Testbed } from "planck/with-testbed";
+import { PLAYER_1, PLAYER_2, SYSTEM, on } from "@rcade/plugin-input-classic";
+import {
+  PLAYER_1 as PLAYER_1_SPINNER,
+  PLAYER_2 as PLAYER_2_SPINNER,
+} from "@rcade/plugin-input-spinners";
+import { Testbed, World, Chain, Polygon, Vec2 } from "planck/with-testbed";
 import "./style.css";
-import { PLAYER_1, SYSTEM, on } from "@rcade/plugin-input-classic";
-import { Chain, Polygon, Vec2 } from "planck";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `
@@ -45,25 +48,91 @@ arena.createFixture({
 
 let player1spinner = world.createBody({
   type: "dynamic",
-  position: { x: -10, y: 0 },
+  position: { x: -20, y: 10 },
 });
 player1spinner.createFixture({
   shape: new Polygon(getVectorsForRegularPolygonOfSize(2, 6)),
   density: 1.0,
-  friction: 0.3,
+  friction: 0.7,
   restitution: 1,
 });
 
 let player2spinner = world.createBody({
   type: "dynamic",
-  position: { x: 10, y: 0 },
+  position: { x: 20, y: 10 },
+  angle: 0,
 });
 player2spinner.createFixture({
   shape: new Polygon(getVectorsForRegularPolygonOfSize(2, 6)),
   density: 1.0,
+  friction: 0.7,
+  restitution: 1,
+});
+
+let player1arrow = world.createBody({
+  type: "static",
+  position: { x: -20, y: 10 },
+  active: false,
+  angle: 0,
+});
+
+player1arrow.createFixture({
+  shape: new Chain([
+    Vec2(0, 0),
+    Vec2(10, 0),
+    Vec2(10, 3),
+    Vec2(13, 0),
+    Vec2(10, -3),
+    Vec2(10, 0),
+  ]),
+  density: 1.0,
   friction: 0.3,
   restitution: 1,
 });
+
+let player2arrow = world.createBody({
+  type: "static",
+  position: { x: 20, y: 10 },
+  active: false,
+});
+player2arrow.createFixture({
+  shape: new Chain([
+    Vec2(0, 0),
+    Vec2(-10, 0),
+    Vec2(-10, -3),
+    Vec2(-13, 0),
+    Vec2(-10, 3),
+    Vec2(-10, 0),
+  ]),
+  density: 1.0,
+  friction: 0.3,
+  restitution: 1,
+});
+
+let hasPlayer1Launched = false;
+let hasPlayer2Launched = false;
+
+function launchPlayer1() {
+  if (hasPlayer1Launched) return;
+  hasPlayer1Launched = true;
+  const direction = Math.sin(player1arrow.getAngle());
+  player1spinner.applyLinearImpulse(
+    Vec2(500, direction * 500),
+    player1spinner.getPosition(),
+  );
+  world.destroyBody(player1arrow);
+}
+
+function launchPlayer2() {
+  if (hasPlayer2Launched) return;
+  hasPlayer2Launched = true;
+  const direction = Math.sin(player2arrow.getAngle());
+  player2spinner.applyLinearImpulse(
+    Vec2(-500, -direction * 500),
+    player2spinner.getPosition(),
+  );
+  world.destroyBody(player2arrow);
+}
 
 let previousTimestamp: number | null = null;
 function update(timestamp: number) {
@@ -76,17 +145,10 @@ function update(timestamp: number) {
     gameStarted = true;
     testbed.start(world);
 
-    player1spinner.applyLinearImpulse(
-      Vec2(500, 500),
-      player1spinner.getPosition(),
-    );
-
-    player1spinner.applyAngularImpulse(5);
-    player2spinner.applyLinearImpulse(
-      Vec2(500, 500),
-      player2spinner.getPosition(),
-    );
-    player2spinner.applyAngularImpulse(5);
+    setTimeout(() => {
+      launchPlayer1();
+      launchPlayer2();
+    }, 5000);
 
     if (SYSTEM.ONE_PLAYER) {
       status.textContent = "Game Started!";
@@ -94,15 +156,56 @@ function update(timestamp: number) {
       testbed.start(world);
     }
   } else {
-    const inputs: string[] = [];
-    if (PLAYER_1.DPAD.up) inputs.push("↑");
-    if (PLAYER_1.DPAD.down) inputs.push("↓");
-    if (PLAYER_1.DPAD.left) inputs.push("←");
-    if (PLAYER_1.DPAD.right) inputs.push("→");
-    if (PLAYER_1.A) inputs.push("A");
-    if (PLAYER_1.B) inputs.push("B");
+    const dt = timestamp - (previousTimestamp ?? 0);
+    const dt_seconds = dt / 1000;
+    const SPEED = 300;
 
-    controls.textContent = inputs.length > 0 ? inputs.join(" ") : "-";
+    if (PLAYER_1.A && !hasPlayer1Launched) {
+      launchPlayer1();
+    }
+
+    if (!hasPlayer1Launched) {
+      const amount =
+        (PLAYER_1_SPINNER.SPINNER.step_delta /
+          PLAYER_1_SPINNER.SPINNER.step_resolution) *
+        SPEED;
+
+      player1spinner.applyAngularImpulse(amount * dt_seconds);
+    }
+
+    if (!hasPlayer2Launched) {
+      const amount =
+        (PLAYER_2_SPINNER.SPINNER.step_delta /
+          PLAYER_2_SPINNER.SPINNER.step_resolution) *
+        SPEED;
+
+      player2spinner.applyAngularImpulse(amount * dt_seconds);
+    }
+
+    if (PLAYER_2.A && !hasPlayer2Launched) {
+      launchPlayer2();
+    }
+
+    if (PLAYER_1.DPAD.up) {
+      let newAngle = player1arrow.getAngle() + 0.05;
+      if (newAngle > 1) newAngle = 1;
+      player1arrow.setAngle(newAngle);
+    }
+    if (PLAYER_1.DPAD.down) {
+      let newAngle = player1arrow.getAngle() - 0.05;
+      if (newAngle < -1) newAngle = -1;
+      player1arrow.setAngle(newAngle);
+    }
+    if (PLAYER_2.DPAD.up) {
+      let newAngle = player2arrow.getAngle() - 0.05;
+      if (newAngle < -1) newAngle = -1;
+      player2arrow.setAngle(newAngle);
+    }
+    if (PLAYER_2.DPAD.down) {
+      let newAngle = player2arrow.getAngle() + 0.05;
+      if (newAngle > 1) newAngle = 1;
+      player2arrow.setAngle(newAngle);
+    }
   }
 
   requestAnimationFrame(update);
