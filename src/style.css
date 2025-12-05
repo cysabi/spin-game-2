@@ -76,9 +76,16 @@ body {
 
 .power-bar {
     width: 100%;
-    background: greenyellow;
     border-radius: 4px;
     transition: height 0.25s ease-out;
+}
+
+#player-1-power-bar {
+    background: rebeccapurple;
+}
+
+#player-2-power-bar {
+    background: darkkhaki;
 }
 
 .not-started #player-1-data {

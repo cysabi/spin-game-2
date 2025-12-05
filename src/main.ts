@@ -69,6 +69,9 @@ let player1spinner = world.createBody({
   type: "dynamic",
   position: { x: -20, y: 10 },
   userData: "1",
+  style: {
+    fill: "rebeccapurple",
+  },
 });
 player1spinner.createFixture({
   shape: new Polygon(getVectorsForRegularPolygonOfSize(4, 6)),
@@ -81,6 +84,9 @@ let player2spinner = world.createBody({
   type: "dynamic",
   position: { x: 20, y: 10 },
   userData: "2",
+  style: {
+    fill: "darkkhaki",
+  },
 });
 player2spinner.createFixture({
   shape: new Polygon(getVectorsForRegularPolygonOfSize(4, 6)),
@@ -134,7 +140,7 @@ let hasPlayer2Launched = false;
 
 let winner: null | 1 | 2 = null;
 
-const LAUNCH_SPEED = 1000;
+const LAUNCH_SPEED = 10000;
 
 function launchPlayer1() {
   if (hasPlayer1Launched) return;
@@ -167,14 +173,14 @@ function bowlGravity(spinner: Body, dt: number) {
   spinner.applyLinearImpulse(
     Vec2.mul(
       angle,
-      (Math.max(0, angle.lengthSquared() - 5) / 3) * (dt / 100000),
+      (Math.max(0, angle.lengthSquared() - 10) / 4) * (dt / 100000),
     ),
     spinner.getPosition(),
   );
 }
 
 function spinDecay(vel: number, dt: number) {
-  const decay = dt * 0.00001;
+  const decay = dt * 0.000005;
   return Math.max(0, vel - decay);
 }
 
@@ -183,24 +189,21 @@ world.on("begin-contact", function (contact) {
   let bodyB = contact.getFixtureB().getBody();
 
   if (bodyA.getUserData() === "1" || bodyB.getUserData() === "1") {
-    angularVelocity1 = Math.max(0, angularVelocity1 - Math.random() * 8);
+    angularVelocity1 = Math.max(0, angularVelocity1 - Math.random() * 6);
   }
   if (bodyA.getUserData() === "2" || bodyB.getUserData() === "2") {
-    angularVelocity2 = Math.max(0, angularVelocity2 - Math.random() * 8);
+    angularVelocity2 = Math.max(0, angularVelocity2 - Math.random() * 6);
   }
 });
 
 let angularVelocity1 = 0;
 let angularVelocity2 = 0;
 
+const player1PowerBar = document.getElementById("player-1-power-bar");
+const player2PowerBar = document.getElementById("player-2-power-bar");
+
 function update(dt: number) {
-  const player1PowerBar = document.getElementById("player-1-power-bar");
-  const player2PowerBar = document.getElementById("player-2-power-bar");
-
   if (!gameStarted) {
-    // gameStarted = true;
-    // testbed.start(world);
-
     if (SYSTEM.TWO_PLAYER) {
       status.textContent = "";
       title.textContent = "";
@@ -224,7 +227,7 @@ function update(dt: number) {
     }
   } else {
     const dt_seconds = dt / 1000;
-    const SPEED = 200;
+    const SPEED = 100;
 
     // const testStepDelta = 20;
     // const testStepResolution = 64;
@@ -232,12 +235,13 @@ function update(dt: number) {
     if (!hasPlayer1Launched) {
       // const amount = (testStepDelta / testStepResolution) * SPEED;
       const amount =
-        (PLAYER_1_SPINNER.SPINNER.step_delta /
+        (Math.abs(PLAYER_1_SPINNER.SPINNER.step_delta) /
           PLAYER_1_SPINNER.SPINNER.step_resolution) *
         SPEED;
 
       player1spinner.applyAngularImpulse(amount * dt_seconds);
     } else {
+      if (winner === 1) return;
       bowlGravity(player1spinner, dt);
       const decay = spinDecay(angularVelocity1, dt);
       if (decay > 0) {
@@ -249,12 +253,13 @@ function update(dt: number) {
     if (!hasPlayer2Launched) {
       // const amount = (testStepDelta / testStepResolution) * SPEED;
       const amount =
-        (PLAYER_2_SPINNER.SPINNER.step_delta /
+        (Math.abs(PLAYER_2_SPINNER.SPINNER.step_delta) /
           PLAYER_2_SPINNER.SPINNER.step_resolution) *
         SPEED;
 
       player2spinner.applyAngularImpulse(amount * dt_seconds);
     } else {
+      if (winner === 2) return;
       bowlGravity(player2spinner, dt);
       const decay = spinDecay(angularVelocity2, dt);
       if (decay > 0) {
@@ -288,14 +293,32 @@ function update(dt: number) {
     const player2power = Math.abs(player2spinner.getAngularVelocity());
 
     if (hasPlayer1Launched && hasPlayer2Launched) {
-      if (player1power < 10) {
-        winner = 2;
-      } else if (player2power < 10) {
-        winner = 1;
+      if (!winner) {
+        if (player1power <= 0.1) {
+          winner = 2;
+        } else if (player2power <= 0.1) {
+          winner = 1;
+        }
       }
 
       if (winner) {
-        console.log("WINNER", winner);
+        topTextDisplay.textContent = `PLAYER ${winner} WINS!!!`;
+
+        if (winner === 1) {
+          const amount =
+            (Math.abs(PLAYER_1_SPINNER.SPINNER.step_delta) /
+              PLAYER_1_SPINNER.SPINNER.step_resolution) *
+            SPEED;
+
+          player1spinner.applyAngularImpulse(amount * dt_seconds);
+        } else if (winner === 2) {
+          const amount =
+            (Math.abs(PLAYER_2_SPINNER.SPINNER.step_delta) /
+              PLAYER_2_SPINNER.SPINNER.step_resolution) *
+            SPEED;
+
+          player2spinner.applyAngularImpulse(amount * dt_seconds);
+        }
       }
     }
 
