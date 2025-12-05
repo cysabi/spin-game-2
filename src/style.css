@@ -78,6 +78,7 @@ body {
     width: 100%;
     background: greenyellow;
     border-radius: 4px;
+    transition: height 0.25s ease-out;
 }
 
 .not-started #player-1-data {
