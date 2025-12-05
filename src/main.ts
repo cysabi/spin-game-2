@@ -1,4 +1,4 @@
-import { World } from "planck";
+import { Box, Edge, World, Testbed } from "planck/with-testbed";
 import "./style.css";
 import { PLAYER_1, SYSTEM } from "@rcade/plugin-input-classic";
 
@@ -17,6 +17,8 @@ let gameStarted = false;
 let world = new World({
     gravity: { x: 0, y: -10 },
 });
+const testbed = Testbed.mount({});
+testbed.start(world);
 
 let platform = world.createBody({
     type: "static",
