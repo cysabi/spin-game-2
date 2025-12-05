@@ -1,12 +1,17 @@
 {
   "$schema": "https://rcade.dev/manifest.schema.json",
-  "name": "cysabi-rcade",
-  "display_name": "cysabi-rcade",
-  "description": "cysabi-rcade",
+  "name": "let-it-rip",
+  "display_name": "Let It Rip",
+  "description": "Let It Rip",
   "visibility": "public",
-  "authors": {
-    "display_name": "cysabi"
-  },
+  "authors": [
+    {
+      "display_name": "Cyrene Zhang"
+    },
+    {
+      "display_name": "Henry Fellerhoff"
+    }
+  ],
   "dependencies": [
     {
       "name": "@rcade/input-classic",

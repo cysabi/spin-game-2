@@ -8,13 +8,23 @@ import "./style.css";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `
-  <h1>cysabi-rcade</h1>
-  <p id="status">Press 1P START</p>
-  <div id="controls"></div>
+  <h1 id="title">Let It Rip</h1>
+  <p id="status">Press 2P START</p>
 `;
 
 const status = document.querySelector<HTMLParagraphElement>("#status")!;
-const controls = document.querySelector<HTMLDivElement>("#controls")!;
+const title = document.querySelector<HTMLParagraphElement>("#title")!;
+const topTextDisplay =
+  document.querySelector<HTMLParagraphElement>("#top-text")!;
+const centerTextDisplay =
+  document.querySelector<HTMLParagraphElement>("#center-text")!;
+
+function setTopText(text: string) {
+  topTextDisplay.textContent = text;
+}
+function setCenterText(text: string) {
+  centerTextDisplay.textContent = text;
+}
 
 let gameStarted = false;
 
@@ -43,7 +53,7 @@ let arena = world.createBody({
   // angle: Math.PI * 0.1,
 });
 arena.createFixture({
-  shape: new Chain(getVectorsForRegularPolygonOfSize(30, 6)),
+  shape: new Chain(getVectorsForRegularPolygonOfSize(30, 9)),
 });
 
 let player1spinner = world.createBody({
@@ -51,7 +61,7 @@ let player1spinner = world.createBody({
   position: { x: -20, y: 10 },
 });
 player1spinner.createFixture({
-  shape: new Polygon(getVectorsForRegularPolygonOfSize(2, 6)),
+  shape: new Polygon(getVectorsForRegularPolygonOfSize(4, 6)),
   density: 1.0,
   friction: 0.7,
   restitution: 1,
@@ -63,7 +73,7 @@ let player2spinner = world.createBody({
   angle: 0,
 });
 player2spinner.createFixture({
-  shape: new Polygon(getVectorsForRegularPolygonOfSize(2, 6)),
+  shape: new Polygon(getVectorsForRegularPolygonOfSize(4, 6)),
   density: 1.0,
   friction: 0.7,
   restitution: 1,
@@ -112,12 +122,16 @@ player2arrow.createFixture({
 let hasPlayer1Launched = false;
 let hasPlayer2Launched = false;
 
+let winner: null | 1 | 2 = null;
+
+const LAUNCH_SPEED = 1000;
+
 function launchPlayer1() {
   if (hasPlayer1Launched) return;
   hasPlayer1Launched = true;
   const direction = Math.sin(player1arrow.getAngle());
   player1spinner.applyLinearImpulse(
-    Vec2(500, direction * 500),
+    Vec2(LAUNCH_SPEED, direction * LAUNCH_SPEED),
     player1spinner.getPosition(),
   );
 
@@ -130,7 +144,7 @@ function launchPlayer2() {
   hasPlayer2Launched = true;
   const direction = Math.sin(player2arrow.getAngle());
   player2spinner.applyLinearImpulse(
-    Vec2(-500, -direction * 500),
+    Vec2(-LAUNCH_SPEED, -direction * LAUNCH_SPEED),
     player2spinner.getPosition(),
   );
   world.destroyBody(player2arrow);
@@ -147,27 +161,34 @@ function update(timestamp: number) {
     previousTimestamp = timestamp;
   }
   if (!gameStarted) {
-    gameStarted = true;
-    testbed.start(world);
+    // gameStarted = true;
+    // testbed.start(world);
 
-    setTimeout(() => {
-      launchPlayer1();
-      launchPlayer2();
-    }, 5000);
-
-    if (SYSTEM.ONE_PLAYER) {
-      status.textContent = "Game Started!";
-      // gameStarted = true;
+    if (SYSTEM.TWO_PLAYER) {
+      status.textContent = "";
+      title.textContent = "";
+      document.body.classList.remove("not-started");
+      setTopText("");
+      gameStarted = true;
       testbed.start(world);
+
+      setCenterText("5");
+      setTimeout(() => setCenterText("4"), 1000);
+      setTimeout(() => setCenterText("3"), 2000);
+      setTimeout(() => setCenterText("2"), 3000);
+      setTimeout(() => setCenterText("1"), 4000);
+
+      setTimeout(() => {
+        launchPlayer1();
+        launchPlayer2();
+        setCenterText("");
+        setTopText("Let It Rip!!!");
+      }, 5000);
     }
   } else {
     const dt = timestamp - (previousTimestamp ?? 0);
     const dt_seconds = dt / 1000;
-    const SPEED = 10;
-
-    if (PLAYER_1.A && !hasPlayer1Launched) {
-      launchPlayer1();
-    }
+    const SPEED = 50;
 
     const testStepDelta = 20;
     const testStepResolution = 64;
@@ -191,10 +212,6 @@ function update(timestamp: number) {
       player2spinner.applyAngularImpulse(amount * dt_seconds);
     }
 
-    if (PLAYER_2.A && !hasPlayer2Launched) {
-      launchPlayer2();
-    }
-
     if (PLAYER_1.DPAD.up) {
       let newAngle = player1arrow.getAngle() + 0.05;
       if (newAngle > 1) newAngle = 1;
@@ -216,11 +233,31 @@ function update(timestamp: number) {
       player2arrow.setAngle(newAngle);
     }
 
+    const player1power =
+      Math.abs(player1spinner.getAngularVelocity()) +
+      player1spinner.getLinearVelocity().length();
+
+    const player2power =
+      Math.abs(player2spinner.getAngularVelocity()) +
+      player2spinner.getLinearVelocity().length();
+
+    if (hasPlayer1Launched && hasPlayer2Launched) {
+      if (player1power < 10) {
+        winner = 2;
+      } else if (player2power < 10) {
+        winner = 1;
+      }
+
+      if (winner) {
+        console.log("WINNER", winner);
+      }
+    }
+
     if (player1PowerBar) {
-      player1PowerBar.style = `height: ${Math.min(300, player1spinner.getAngularVelocity())}px;`;
+      player1PowerBar.style = `height: ${Math.min(150, player1power)}px;`;
     }
     if (player2PowerBar) {
-      player2PowerBar!.style = `height: ${Math.min(300, player2spinner.getAngularVelocity())}px;`;
+      player2PowerBar!.style = `height: ${Math.min(150, player2power)}px;`;
     }
   }
 
