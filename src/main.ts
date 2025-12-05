@@ -226,15 +226,15 @@ function update(dt: number) {
     const dt_seconds = dt / 1000;
     const SPEED = 50;
 
-    const testStepDelta = 20;
-    const testStepResolution = 64;
+    // const testStepDelta = 20;
+    // const testStepResolution = 64;
 
     if (!hasPlayer1Launched) {
-      const amount = (testStepDelta / testStepResolution) * SPEED;
-      // const amount =
-      //   (PLAYER_1_SPINNER.SPINNER.step_delta /
-      //     PLAYER_1_SPINNER.SPINNER.step_resolution) *
-      //   SPEED;
+      // const amount = (testStepDelta / testStepResolution) * SPEED;
+      const amount =
+        (PLAYER_1_SPINNER.SPINNER.step_delta /
+          PLAYER_1_SPINNER.SPINNER.step_resolution) *
+        SPEED;
 
       player1spinner.applyAngularImpulse(amount * dt_seconds);
     } else {
@@ -247,11 +247,11 @@ function update(dt: number) {
     }
 
     if (!hasPlayer2Launched) {
-      const amount = (testStepDelta / testStepResolution) * SPEED;
-      // const amount =
-      //   (PLAYER_2_SPINNER.SPINNER.step_delta /
-      //     PLAYER_2_SPINNER.SPINNER.step_resolution) *
-      //   SPEED;
+      // const amount = (testStepDelta / testStepResolution) * SPEED;
+      const amount =
+        (PLAYER_2_SPINNER.SPINNER.step_delta /
+          PLAYER_2_SPINNER.SPINNER.step_resolution) *
+        SPEED;
 
       player2spinner.applyAngularImpulse(amount * dt_seconds);
     } else {
