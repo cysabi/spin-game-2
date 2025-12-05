@@ -167,7 +167,7 @@ function bowlGravity(spinner: Body, dt: number) {
   spinner.applyLinearImpulse(
     Vec2.mul(
       angle,
-      (Math.max(0, angle.lengthSquared() - 5) / 2) * (dt / 100000),
+      (Math.max(0, angle.lengthSquared() - 5) / 3) * (dt / 100000),
     ),
     spinner.getPosition(),
   );
@@ -224,17 +224,17 @@ function update(dt: number) {
     }
   } else {
     const dt_seconds = dt / 1000;
-    const SPEED = 50;
+    const SPEED = 200;
 
-    const testStepDelta = 20;
-    const testStepResolution = 64;
+    // const testStepDelta = 20;
+    // const testStepResolution = 64;
 
     if (!hasPlayer1Launched) {
-      const amount = (testStepDelta / testStepResolution) * SPEED;
-      // const amount =
-      //   (PLAYER_1_SPINNER.SPINNER.step_delta /
-      //     PLAYER_1_SPINNER.SPINNER.step_resolution) *
-      //   SPEED;
+      // const amount = (testStepDelta / testStepResolution) * SPEED;
+      const amount =
+        (PLAYER_1_SPINNER.SPINNER.step_delta /
+          PLAYER_1_SPINNER.SPINNER.step_resolution) *
+        SPEED;
 
       player1spinner.applyAngularImpulse(amount * dt_seconds);
     } else {
@@ -247,11 +247,11 @@ function update(dt: number) {
     }
 
     if (!hasPlayer2Launched) {
-      const amount = (testStepDelta / testStepResolution) * SPEED;
-      // const amount =
-      //   (PLAYER_2_SPINNER.SPINNER.step_delta /
-      //     PLAYER_2_SPINNER.SPINNER.step_resolution) *
-      //   SPEED;
+      // const amount = (testStepDelta / testStepResolution) * SPEED;
+      const amount =
+        (PLAYER_2_SPINNER.SPINNER.step_delta /
+          PLAYER_2_SPINNER.SPINNER.step_resolution) *
+        SPEED;
 
       player2spinner.applyAngularImpulse(amount * dt_seconds);
     } else {
@@ -284,13 +284,8 @@ function update(dt: number) {
       player2arrow.setAngle(newAngle);
     }
 
-    const player1power =
-      Math.abs(player1spinner.getAngularVelocity()) +
-      player1spinner.getLinearVelocity().length();
-
-    const player2power =
-      Math.abs(player2spinner.getAngularVelocity()) +
-      player2spinner.getLinearVelocity().length();
+    const player1power = Math.abs(player1spinner.getAngularVelocity());
+    const player2power = Math.abs(player2spinner.getAngularVelocity());
 
     if (hasPlayer1Launched && hasPlayer2Launched) {
       if (player1power < 10) {
