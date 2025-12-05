@@ -1,0 +1,16 @@
+{
+  "$schema": "https://rcade.dev/manifest.schema.json",
+  "name": "cysabi-rcade",
+  "display_name": "cysabi-rcade",
+  "description": "cysabi-rcade",
+  "visibility": "public",
+  "authors": {
+    "display_name": "cysabi"
+  },
+  "dependencies": [
+    {
+      "name": "@rcade/input-classic",
+      "version": "1.0.0"
+    }
+  ]
+}
