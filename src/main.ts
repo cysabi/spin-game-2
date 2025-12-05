@@ -120,6 +120,8 @@ function launchPlayer1() {
     Vec2(500, direction * 500),
     player1spinner.getPosition(),
   );
+
+  console.log(player1spinner.getAngularVelocity());
   world.destroyBody(player1arrow);
 }
 
@@ -135,7 +137,10 @@ function launchPlayer2() {
 }
 
 let previousTimestamp: number | null = null;
+
 function update(timestamp: number) {
+  const player1PowerBar = document.getElementById("player-1-power-bar");
+  const player2PowerBar = document.getElementById("player-2-power-bar");
   if (previousTimestamp) {
     const dt = timestamp - previousTimestamp;
     world.step(dt);
@@ -158,26 +163,30 @@ function update(timestamp: number) {
   } else {
     const dt = timestamp - (previousTimestamp ?? 0);
     const dt_seconds = dt / 1000;
-    const SPEED = 300;
+    const SPEED = 10;
 
     if (PLAYER_1.A && !hasPlayer1Launched) {
       launchPlayer1();
     }
 
+    const testStepDelta = 20;
+    const testStepResolution = 64;
     if (!hasPlayer1Launched) {
-      const amount =
-        (PLAYER_1_SPINNER.SPINNER.step_delta /
-          PLAYER_1_SPINNER.SPINNER.step_resolution) *
-        SPEED;
+      const amount = (testStepDelta / testStepResolution) * SPEED;
+      // const amount =
+      //   (PLAYER_1_SPINNER.SPINNER.step_delta /
+      //     PLAYER_1_SPINNER.SPINNER.step_resolution) *
+      //   SPEED;
 
       player1spinner.applyAngularImpulse(amount * dt_seconds);
     }
 
     if (!hasPlayer2Launched) {
-      const amount =
-        (PLAYER_2_SPINNER.SPINNER.step_delta /
-          PLAYER_2_SPINNER.SPINNER.step_resolution) *
-        SPEED;
+      const amount = (testStepDelta / testStepResolution) * SPEED;
+      // const amount =
+      //   (PLAYER_2_SPINNER.SPINNER.step_delta /
+      //     PLAYER_2_SPINNER.SPINNER.step_resolution) *
+      //   SPEED;
 
       player2spinner.applyAngularImpulse(amount * dt_seconds);
     }
@@ -205,6 +214,13 @@ function update(timestamp: number) {
       let newAngle = player2arrow.getAngle() + 0.05;
       if (newAngle > 1) newAngle = 1;
       player2arrow.setAngle(newAngle);
+    }
+
+    if (player1PowerBar) {
+      player1PowerBar.style = `height: ${Math.min(300, player1spinner.getAngularVelocity())}px;`;
+    }
+    if (player2PowerBar) {
+      player2PowerBar!.style = `height: ${Math.min(300, player2spinner.getAngularVelocity())}px;`;
     }
   }
 

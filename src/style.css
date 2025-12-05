@@ -9,16 +9,72 @@ body {
     width: 336px;
     height: 262px;
     overflow: hidden;
-    /*background-color: black;*/
+    background-color: blue;
     background-color: #222;
     color: #eee;
     font-family: system-ui, sans-serif;
 }
 
+#player-1-data {
+    /*background: red;*/
+    position: absolute;
+    inset-block: 0px;
+    left: 0px;
+    width: 37px;
+    z-index: 9999;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+#player-1-data > * {
+    font-size: 0.4rem;
+    text-align: left;
+}
+#player-2-data > * {
+    font-size: 0.4rem;
+    text-align: right;
+}
+
+#player-2-data {
+    /*background: red;*/
+    position: absolute;
+    inset-block: 0px;
+    right: 0px;
+    width: 37px;
+    z-index: 9999;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.power-container {
+    background: black;
+    height: 100px;
+    width: 24px;
+    border-radius: 4px;
+    outline: 1px solid white;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+.power-bar {
+    width: 100%;
+    background: greenyellow;
+    border-radius: 4px;
+}
+
 body > canvas {
     width: 262px !important;
     height: 262px !important;
-    transform: translate(36px, 0px);
+    transform: translate(37px, 0px);
 }
 
 #app {
